@@ -2,8 +2,8 @@ let draggableElement = document.querySelector(".draggable-element");
 
 let initialX = 0,
   initialY = 0,
-  currentX = 0,
-  currentY = 0;
+  currentX,
+  currentY;
 let moveElement = false;
 
 let events = {
@@ -44,20 +44,32 @@ draggableElement.addEventListener(events[deviceType].down, (e) => {
 });
 
 draggableElement.addEventListener(events[deviceType].move, (e) => {
-  e.preventDefault();
-
   if (moveElement) {
+    e.preventDefault();
     currentX = !isTouchDevice() ? e.clientX : e.touches[0].clientX;
     currentY = !isTouchDevice() ? e.clientY : e.touches[0].clientY;
 
     draggableElement.style.top = `${
-      draggableElement.offsetTop + (currentY - initialY)
+      draggableElement.offsetTop - (initialY - currentY)
     }px`;
     draggableElement.style.left = `${
-      draggableElement.offsetLeft + (currentX - initialX)
+      draggableElement.offsetLeft - (initialX - currentX)
     }px`;
 
     initialX = currentX;
     initialY = currentY;
   }
 });
+
+draggableElement.addEventListener(
+  events[deviceType].up,
+  (stopMovement = (e) => {
+    moveElement = false;
+  })
+);
+
+draggableElement.addEventListener("mouseleave", stopMovement);
+draggableElement.addEventListener(
+  events[deviceType].up,
+  (e) => (moveElement = false)
+);
